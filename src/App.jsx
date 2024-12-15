@@ -13,8 +13,8 @@ export default function App() {
 	);
 
 	return (
-		<div className="w-screen h-screen flex">
+		<section className="w-screen h-screen flex bg-black">
 			<Partition node={partitionState} dispatch={partitionDispatch} />
-		</div>
+		</section>
 	);
 }

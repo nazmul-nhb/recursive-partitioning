@@ -33,32 +33,30 @@ const Partition = ({ node, dispatch }) => {
 	if (node.children.length === 0) {
 		return (
 			<div
-				className="flex items-center justify-center flex-1"
+				className="flex items-center justify-center flex-1 gap-1"
 				style={{ backgroundColor: node.color }}
 			>
-				<div className="flex items-center space-x-2">
+				<div className="flex items-center gap-1 text-sm font-bold">
 					<button
 						onClick={() => handleSplit("vertical")}
-						className="bg-blue-800 text-white px-2 py-1 rounded"
+						className="bg-blue-800 text-white w-6 h-6 rounded"
 					>
 						V
 					</button>
 					<button
 						onClick={() => handleSplit("horizontal")}
-						className="bg-teal-800 text-white px-2 py-1 rounded"
+						className="bg-teal-800 text-white w-6 h-6 rounded"
 					>
 						H
 					</button>
 					{node.isRemovable && node.id !== 1 && (
 						<button
 							onClick={handleRemove}
-							className="bg-red-500 text-white px-2.5 py-1 rounded"
+							className="bg-red-500 text-white w-6 h-6 rounded"
 						>
 							-
 						</button>
 					)}
-
-					<p>{node.id}</p>
 				</div>
 			</div>
 		);
@@ -67,7 +65,7 @@ const Partition = ({ node, dispatch }) => {
 	// Render node with children
 	return (
 		<div
-			className={`flex flex-1 ${
+			className={`flex flex-1 gap-1 ${
 				node.orientation === "vertical" ? "flex-col" : "flex-row"
 			}`}
 		>

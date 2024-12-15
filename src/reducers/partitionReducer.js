@@ -1,6 +1,8 @@
 //@ts-check
 import { generateRandomColor } from "../utilities/colorGenerator";
 
+let idCounter = 2;
+
 /**
  * @typedef {{ id:number, color:string, orientation:"vertical" | "horizontal" | null, isRemovable:boolean, children:PartitionState[] }} PartitionState
  * @typedef {{ type: 'SPLIT', payload: { id: number, orientation: "vertical" | "horizontal" } } | { type: 'REMOVE', payload: { id: number } }} Action
@@ -21,10 +23,7 @@ export const initialPartitionState = {
  * @param {Action} action The dispatched action
  * @returns {PartitionState} The new state
  */
-export const partitionReducer = (state, action) => {
-    let idCounter = 2;
-
-    switch (action.type) {
+export const partitionReducer = (state, action) => {switch (action.type) {
         case "SPLIT": {
             const { id, orientation } = action.payload;
 
