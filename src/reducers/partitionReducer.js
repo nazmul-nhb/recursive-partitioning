@@ -1,8 +1,9 @@
+//@ts-check
 import { generateRandomColor } from "../utilities/colorGenerator";
 
 /**
- * @typedef {{ id: number, color: string, orientation: "vertical" | "horizontal" | null, children: PartitionState[] }} PartitionState
- * @typedef {{ type: 'SPLIT', payload: { id: number, orientation: "vertical" | "horizontal" } } | { type: 'REMOVE', payload: { id: number } } | { type: 'REMOVE_CHILDREN', payload: { id: number } }} Action
+ * @typedef {{ id:number, color:string, orientation:"vertical" | "horizontal" | null, isRemovable:boolean, children:PartitionState[] }} PartitionState
+ * @typedef {{ type: 'SPLIT', payload: { id: number, orientation: "vertical" | "horizontal" } } | { type: 'REMOVE', payload: { id: number } }} Action
  */
 
 /** @type {PartitionState} */
@@ -10,6 +11,7 @@ export const initialPartitionState = {
     id: 1,
     color: generateRandomColor(),
     orientation: null,
+    isRemovable: false,
     children: [],
 };
 
@@ -20,32 +22,44 @@ export const initialPartitionState = {
  * @returns {PartitionState} The new state
  */
 export const partitionReducer = (state, action) => {
+    let idCounter = 2;
+
     switch (action.type) {
         case "SPLIT": {
             const { id, orientation } = action.payload;
 
+            /**
+             * Recursive function to split a partition
+             * @param {PartitionState} node
+             * @returns {PartitionState}
+             */
             const splitPartition = (node) => {
+                // Only split the partition with the matching id
                 if (node.id === id) {
+                    // Split the current node and add two new children
                     return {
                         ...node,
                         orientation,
                         children: [
                             {
-                                id: Date.now(),
+                                id: idCounter++,
                                 color: node.color,
                                 orientation: null,
+                                isRemovable: true,
                                 children: [],
                             },
                             {
-                                id: Date.now() + 1,
+                                id: idCounter++,
                                 color: generateRandomColor(),
                                 orientation: null,
+                                isRemovable: true,
                                 children: [],
                             },
                         ],
                     };
                 }
 
+                // If the node has children, split them recursively
                 if (node.children.length > 0) {
                     return {
                         ...node,
@@ -53,6 +67,7 @@ export const partitionReducer = (state, action) => {
                     };
                 }
 
+                // Return the node unmodified if it's not being splitted.
                 return node;
             };
 
@@ -61,16 +76,24 @@ export const partitionReducer = (state, action) => {
 
         case "REMOVE": {
             const { id } = action.payload;
-
+            /**
+             * Recursive function to remove a partition
+             * @param {PartitionState} node
+             * @returns {PartitionState | null}
+             */
             const removePartition = (node) => {
+                // If this is the node to remove, return null
                 if (node.id === id) {
                     return null;
                 }
 
+                // If the node has children, only remove the target node
                 if (node.children.length > 0) {
                     return {
                         ...node,
-                        children: node.children.map(removePartition).filter((child) => child !== null),
+                        children: node.children
+                            .map(removePartition)
+                            .filter((child) => child !== null), // Remove children with value `null`
                     };
                 }
 
@@ -78,32 +101,7 @@ export const partitionReducer = (state, action) => {
             };
 
             const newState = removePartition(state);
-            // Ensure root node (id: 1) is never removed
-            return newState || { ...state, children: [] };
-        }
-
-        case "REMOVE_CHILDREN": {
-            const { id } = action.payload;
-
-            const clearChildren = (node) => {
-                if (node.id === id) {
-                    return {
-                        ...node,
-                        children: [],
-                    };
-                }
-
-                if (node.children.length > 0) {
-                    return {
-                        ...node,
-                        children: node.children.map(clearChildren),
-                    };
-                }
-
-                return node;
-            };
-
-            return clearChildren(state);
+            return newState ? newState : state; // If no partition was removed, return the initial intact state
         }
 
         default:

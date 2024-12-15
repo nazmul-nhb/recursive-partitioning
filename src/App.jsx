@@ -14,10 +14,7 @@ export default function App() {
 
 	return (
 		<div className="w-screen h-screen flex">
-			<Partition
-				node={partitionState}
-				dispatchFunction={partitionDispatch}
-			/>
+			<Partition node={partitionState} dispatch={partitionDispatch} />
 		</div>
 	);
 }
