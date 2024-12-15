@@ -7,19 +7,17 @@ import {
 } from "./reducers/partitionReducer";
 
 export default function App() {
-	const [state, dispatch] = useReducer(
+	const [partitionState, partitionDispatch] = useReducer(
 		partitionReducer,
 		initialPartitionState
 	);
 
 	return (
-		<div
-			className="w-screen h-screen"
-			style={{
-				backgroundColor: state.color,
-			}}
-		>
-			<Partition node={state} dispatch={dispatch} />
+		<div className="w-screen h-screen flex">
+			<Partition
+				node={partitionState}
+				dispatchFunction={partitionDispatch}
+			/>
 		</div>
 	);
 }

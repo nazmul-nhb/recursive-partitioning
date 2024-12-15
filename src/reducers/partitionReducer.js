@@ -1,9 +1,8 @@
-//@ts-check
 import { generateRandomColor } from "../utilities/colorGenerator";
 
 /**
- * @typedef {{ id: number, color: string, orientation: "v" | "h" | null, children: PartitionState[] }} PartitionState
- * @typedef {{ type: 'SPLIT', payload: { id: number, orientation: "v" | "h" } } | { type: 'REMOVE', payload: { id: number } }} Action
+ * @typedef {{ id: number, color: string, orientation: "vertical" | "horizontal" | null, children: PartitionState[] }} PartitionState
+ * @typedef {{ type: 'SPLIT', payload: { id: number, orientation: "vertical" | "horizontal" } } | { type: 'REMOVE', payload: { id: number } } | { type: 'REMOVE_CHILDREN', payload: { id: number } }} Action
  */
 
 /** @type {PartitionState} */
@@ -25,11 +24,6 @@ export const partitionReducer = (state, action) => {
         case "SPLIT": {
             const { id, orientation } = action.payload;
 
-            /**
-             * Recursive function to split a partition
-             * @param {PartitionState} node
-             * @returns {PartitionState}
-             */
             const splitPartition = (node) => {
                 if (node.id === id) {
                     return {
@@ -68,11 +62,6 @@ export const partitionReducer = (state, action) => {
         case "REMOVE": {
             const { id } = action.payload;
 
-            /**
-             * Recursive function to remove a partition
-             * @param {PartitionState} node
-             * @returns {PartitionState | null}
-             */
             const removePartition = (node) => {
                 if (node.id === id) {
                     return null;
@@ -82,15 +71,39 @@ export const partitionReducer = (state, action) => {
                     return {
                         ...node,
                         children: node.children.map(removePartition).filter((child) => child !== null),
-
                     };
                 }
-                
+
                 return node;
             };
 
             const newState = removePartition(state);
-            return newState ? newState : { id: Date.now(), color: generateRandomColor(), orientation: null, children: [] };
+            // Ensure root node (id: 1) is never removed
+            return newState || { ...state, children: [] };
+        }
+
+        case "REMOVE_CHILDREN": {
+            const { id } = action.payload;
+
+            const clearChildren = (node) => {
+                if (node.id === id) {
+                    return {
+                        ...node,
+                        children: [],
+                    };
+                }
+
+                if (node.children.length > 0) {
+                    return {
+                        ...node,
+                        children: node.children.map(clearChildren),
+                    };
+                }
+
+                return node;
+            };
+
+            return clearChildren(state);
         }
 
         default:
