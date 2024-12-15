@@ -30,7 +30,7 @@ const Partition = ({ node, dispatch }) => {
 	};
 
 	// Render node with no children
-	if (node.children.length === 0) {
+    if (node.children.length === 0) {
 		return (
 			<div
 				className="flex items-center justify-center flex-1 gap-1"
@@ -49,7 +49,7 @@ const Partition = ({ node, dispatch }) => {
 					>
 						H
 					</button>
-					{node.isRemovable && node.id !== 1 && (
+					{node.isRemovable && (
 						<button
 							onClick={handleRemove}
 							className="bg-red-500 text-white w-6 h-6 rounded"
@@ -57,6 +57,7 @@ const Partition = ({ node, dispatch }) => {
 							-
 						</button>
 					)}
+					<p>{node.id}</p>
 				</div>
 			</div>
 		);
@@ -66,7 +67,7 @@ const Partition = ({ node, dispatch }) => {
 	return (
 		<div
 			className={`flex flex-1 gap-1 ${
-				node.orientation === "vertical" ? "flex-col" : "flex-row"
+				node.orientation === "vertical" ? "flex-row" : "flex-col"
 			}`}
 		>
 			{node.children.map((child) => (

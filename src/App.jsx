@@ -12,6 +12,8 @@ export default function App() {
 		initialPartitionState
 	);
 
+  console.log(partitionState);
+
 	return (
 		<section className="w-screen h-screen flex bg-black">
 			<Partition node={partitionState} dispatch={partitionDispatch} />
