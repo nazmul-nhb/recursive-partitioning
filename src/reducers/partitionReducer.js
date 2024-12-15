@@ -1,21 +1,24 @@
-//@ts-check
+// @ts-check
 import { generateRandomColor } from "../utilities/colorGenerator";
 
-/**
- * @typedef {{ id:number, color:string, orientation:"vertical" | "horizontal" | null, isRemovable:boolean, children:PartitionState[] }} PartitionState
- * @typedef {{ type: 'SPLIT', payload: { id: number, orientation: "vertical" | "horizontal" } } | { type: 'REMOVE', payload: { id: number } }} Action
- */
-
-/** @type {PartitionState} */
-export const initialPartitionState = {
-    id: 1,
-    color: generateRandomColor(),
-    orientation: null,
-    isRemovable: false,
-    children: [],
-};
-
 let idCounter = 2;
+
+/**
+ * @typedef {{
+ *   id: number,
+ *   color: string,
+ *   orientation: "vertical" | "horizontal" | null,
+ *   children: PartitionState[],
+ *   totalPartitions: number
+ * }} PartitionState
+ * @typedef {{
+ *   type: "SPLIT",
+ *   payload: { id: number, orientation: "vertical" | "horizontal" }
+ * } | {
+ *   type: "REMOVE",
+ *   payload: { id: number }
+ * }} Action
+ */
 
 /**
  * Reducer function to manage partition state.
@@ -29,46 +32,42 @@ export const partitionReducer = (state, action) => {
             const { id, orientation } = action.payload;
 
             /**
-             * Recursive function to split a partition
+             * Recursive function to split a partition.
              * @param {PartitionState} node
              * @returns {PartitionState}
              */
             const splitPartition = (node) => {
-                // Only split the partition with the matching id
                 if (node.id === id) {
-                    // Split the current node and add two new children
+                    const newChildren = [
+                        {
+                            id: idCounter++,
+                            color: node.color,
+                            orientation: null,
+                            children: [],
+                            totalPartitions: 1,
+                        },
+                        {
+                            id: idCounter++,
+                            color: generateRandomColor(),
+                            orientation: null,
+                            children: [],
+                            totalPartitions: 1,
+                        },
+                    ];
                     return {
                         ...node,
                         orientation,
-                        children: [
-                            {
-                                id: idCounter++,
-                                color: node.color,
-                                orientation: null,
-                                isRemovable: true,
-                                children: [],
-                            },
-                            {
-                                id: idCounter++,
-                                color: generateRandomColor(),
-                                orientation: null,
-                                isRemovable: true,
-                                children: [],
-                            },
-                        ],
+                        children: newChildren,
+                        totalPartitions: getTotalPartitions(newChildren),
                     };
                 }
 
-                // If the node has children, split them recursively
-                if (node.children.length > 0) {
-                    return {
-                        ...node,
-                        children: node.children.map(splitPartition),
-                    };
-                }
-
-                // Return the node unmodified if it's not being splitted.
-                return node;
+                const updatedChildren = node.children.map(splitPartition);
+                return {
+                    ...node,
+                    children: updatedChildren,
+                    totalPartitions: getTotalPartitions(updatedChildren),
+                };
             };
 
             return splitPartition(state);
@@ -76,35 +75,39 @@ export const partitionReducer = (state, action) => {
 
         case "REMOVE": {
             const { id } = action.payload;
+
             /**
-             * Recursive function to remove a partition
+             * Recursive function to remove a partition.
              * @param {PartitionState} node
              * @returns {PartitionState | null}
              */
             const removePartition = (node) => {
-                // If this is the node to remove, return null
-                if (node.id === id) {
-                    return null;
-                }
+                if (node.id === id) return null;
 
-                // If the node has children, only remove the target node
-                if (node.children.length > 0) {
-                    return {
-                        ...node,
-                        children: node.children
-                            .map(removePartition)
-                            .filter((child) => child !== null), // Remove children with value `null`
-                    };
-                }
+                const updatedChildren = node.children
+                    .map(removePartition)
+                    .filter((child) => child !== null);
 
-                return node;
+                return {
+                    ...node,
+                    children: updatedChildren,
+                    totalPartitions: updatedChildren.length ? getTotalPartitions(updatedChildren) : 1,
+                };
             };
 
-            const newState = removePartition(state);
-            return newState ? newState : state; // If no partition was removed, return the initial intact state
+            return removePartition(state) || state;
         }
 
         default:
             return state;
     }
 };
+
+/**
+ * Helper function to calculate total partitions.
+ * @param {PartitionState[]} children 
+ * @returns {number} The total number of partitions.
+ */
+export const getTotalPartitions = (children) => {
+    return children.reduce((sum, child) => sum + child.totalPartitions, 0);
+}

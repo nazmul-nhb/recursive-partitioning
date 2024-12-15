@@ -1,13 +1,17 @@
-//@ts-check
+// @ts-check
 import React from "react";
+
+/** @typedef {import('./reducers/partitionReducer').PartitionState} PartitionState */
+/** @typedef {import('./reducers/partitionReducer').Action} Action */
 
 /**
  * Partition Component
- * @param {Object} props Partition Component Props
- * @param {import('./reducers/partitionReducer').PartitionState} props.node Child Node
- * @param {React.Dispatch<import('./reducers/partitionReducer').Action>} props.dispatch Dispatch Function
+ * @param {Object} props
+ * @param {PartitionState} props.node
+ * @param {React.Dispatch<Action>} props.dispatch
+ * @param {number} props.totalPartitions
  */
-const Partition = ({ node, dispatch }) => {
+const Partition = ({ node, dispatch, totalPartitions }) => {
 	/**
 	 * Function to dispatch `SPLIT` action
 	 * @param {"vertical" | "horizontal"} orientation Split orientation
@@ -19,9 +23,6 @@ const Partition = ({ node, dispatch }) => {
 		});
 	};
 
-	/**
-	 * Function to dispatch `REMOVE` action
-	 */
 	const handleRemove = () => {
 		dispatch({
 			type: "REMOVE",
@@ -29,8 +30,8 @@ const Partition = ({ node, dispatch }) => {
 		});
 	};
 
-	// Render node with no children
-    if (node.children.length === 0) {
+	// Render if there is no children
+	if (!node.children.length) {
 		return (
 			<div
 				className="flex items-center justify-center flex-1 gap-1"
@@ -49,7 +50,8 @@ const Partition = ({ node, dispatch }) => {
 					>
 						H
 					</button>
-					{node.isRemovable && (
+					{/* Show the remove button if totalPartitions is greater than 1 */}
+					{totalPartitions > 1 && (
 						<button
 							onClick={handleRemove}
 							className="bg-red-500 text-white w-6 h-6 rounded"
@@ -63,7 +65,7 @@ const Partition = ({ node, dispatch }) => {
 		);
 	}
 
-	// Render node with children
+	// Render recursively if there are children
 	return (
 		<div
 			className={`flex flex-1 gap-1 ${
@@ -71,7 +73,12 @@ const Partition = ({ node, dispatch }) => {
 			}`}
 		>
 			{node.children.map((child) => (
-				<Partition key={child.id} node={child} dispatch={dispatch} />
+				<Partition
+					key={child.id}
+					node={child}
+					dispatch={dispatch}
+					totalPartitions={totalPartitions}
+				/>
 			))}
 		</div>
 	);

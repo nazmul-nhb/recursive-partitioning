@@ -14,8 +14,6 @@ const recentColors = [];
  * @returns {string} Generated unique random color.
  */
 export const generateRandomColor = () => {
-    console.log(generatedColors);
-
     let color;
 
     /**
