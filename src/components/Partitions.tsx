@@ -1,36 +1,30 @@
-// @ts-check
 import React from "react";
+import { TAppDispatch } from "../store";
+import { TOrientation, IPartition } from "../types";
+import { remove, split } from "../features/partition";
 
-/** @typedef {import('./reducers/partitionReducer').PartitionState} PartitionState */
-/** @typedef {import('./reducers/partitionReducer').Action} Action */
+interface PartitionProps {
+	node: IPartition;
+	dispatch: TAppDispatch;
+	totalPartitions: number;
+}
 
-/**
- * Partition Component
- * @param {Object} props
- * @param {PartitionState} props.node
- * @param {React.Dispatch<Action>} props.dispatch
- * @param {number} props.totalPartitions
- */
-const Partition = ({ node, dispatch, totalPartitions }) => {
+const Partition: React.FC<PartitionProps> = ({
+	node,
+	dispatch,
+	totalPartitions,
+}) => {
 	/**
 	 * Function to dispatch `SPLIT` action
-	 * @param {"vertical" | "horizontal"} orientation Split orientation
 	 */
-	const handleSplit = (orientation) => {
-		dispatch({
-			type: "SPLIT",
-			payload: { id: node.id, orientation },
-		});
+	const handleSplit = (orientation: TOrientation) => {
+		dispatch(split({ id: node.id, orientation }));
 	};
 
 	const handleRemove = () => {
-		dispatch({
-			type: "REMOVE",
-			payload: { id: node.id },
-		});
+		dispatch(remove({ id: node.id }));
 	};
 
-	// Render if there is no children
 	if (!node.children.length) {
 		return (
 			<div
@@ -50,7 +44,6 @@ const Partition = ({ node, dispatch, totalPartitions }) => {
 					>
 						H
 					</button>
-					{/* Show the remove button if totalPartitions is greater than 1 */}
 					{totalPartitions > 1 && (
 						<button
 							onClick={handleRemove}
@@ -65,7 +58,6 @@ const Partition = ({ node, dispatch, totalPartitions }) => {
 		);
 	}
 
-	// Render recursively if there are children
 	return (
 		<div
 			className={`flex flex-1 gap-1 ${
