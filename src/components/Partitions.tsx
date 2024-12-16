@@ -1,6 +1,6 @@
 import React from "react";
-import { TAppDispatch } from "../store";
-import { TOrientation, IPartition } from "../types";
+import type { TAppDispatch } from "../store";
+import type { TOrientation, IPartition } from "../types";
 import { remove, split } from "../features/partition";
 
 interface PartitionProps {

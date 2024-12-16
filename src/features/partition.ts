@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { generateRandomColor } from "../components/colorGenerator";
-import { IPartition } from "../types";
+import { generateRandomColor } from "../utilities/colorGenerator";
+import type { IPartition } from "../types";
 
 /** Track node ID */
 let idCounter = 2;

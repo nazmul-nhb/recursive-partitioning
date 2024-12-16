@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { TAppDispatch, TRootState } from "./store";
+import type { TAppDispatch, TRootState } from "./store";
 import Partition from "./components/Partitions";
 
 export default function App() {
