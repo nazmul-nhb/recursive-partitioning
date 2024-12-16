@@ -31,7 +31,7 @@ const Partition: React.FC<PartitionProps> = ({
 				className="flex items-center justify-center flex-1 gap-1"
 				style={{ backgroundColor: node.color }}
 			>
-				<div className="flex items-center gap-1 text-sm font-bold">
+				<div className="flex items-center gap-1 text-sm font-semibold">
 					<button
 						onClick={() => handleSplit("vertical")}
 						className="bg-blue-800 text-white w-6 h-6 rounded"
@@ -52,7 +52,7 @@ const Partition: React.FC<PartitionProps> = ({
 							-
 						</button>
 					)}
-					<p>{node.id}</p>
+					{/* <p>{node.id}</p> */}
 				</div>
 			</div>
 		);
